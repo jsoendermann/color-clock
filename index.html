@@ -1,0 +1,54 @@
+<html>
+  <head>
+    <script>
+      function toHex(v) {
+        const h = v.toString(16)
+        return h.length === 1 ? '0' + h : h
+      }
+      function interpolate(c1, c2, r) {
+        const [, r1, g1, b1] = c1.match(/#?(..)(..)(..)/)
+        const [, r2, g2, b2] = c2.match(/#?(..)(..)(..)/)
+
+        var r = Math.ceil(
+          parseInt(r1, 16) * (1 - ratio) + parseInt(r2, 16) * ratio
+        )
+        var g = Math.ceil(
+          parseInt(g1, 16) * (1 - ratio) + parseInt(g2, 16) * ratio
+        )
+        var b = Math.ceil(
+          parseInt(b1, 16) * (1 - ratio) + parseInt(b2, 16) * ratio
+        )
+
+        return '#' + toHex(r) + toHex(g) + toHex(b)
+      }
+
+      const MORNING_COLOR = '#ff0000'
+      const NOON_COLOR = '#ffff00'
+      const EVENING_COLOR = '#0000ff'
+      function update() {
+        let color
+        const hours = new Date().getHours()
+        if (hours < 6) {
+          color = MORNING_COLOR
+        } else if (hours < 12) {
+          const progress = ((hours - 6) * 60 + new Date().getMinutes()) / 360
+          color = interpolate(MORNING_COLOR, NOON_COLOR, progress)
+        } else if (hours < 18) {
+          const progress = ((hours - 12) * 60 + new Date().getMinutes()) / 360
+          color = interpolate(NOON_COLOR, EVENING_COLOR, progress)
+        } else {
+          color = EVENING_COLOR
+        }
+        document.body.style.backgroundColor = color
+      }
+    </script>
+  </head>
+  <body>
+    <script>
+      ;(function () {
+        update()
+        setInterval(update, 60 * 1000)
+      })()
+    </script>
+  </body>
+</html>
